@@ -1,5 +1,7 @@
 package com.futurex.services.FutureXCourseApp;
 
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +14,30 @@ public class CourseController {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    Tracer tracer;
+
     @RequestMapping("/")
     public String getCourseAppHome() {
 
-        return ("Course App Home");
+        Span span = tracer.spanBuilder("getCourseAppHome").startSpan();
+        try{
+            return ("Course App Home");
+        }finally {
+            span.end();
+        }
+
     }
 
     @RequestMapping("/courses")
     public List<Course> getCourses() {
 
-        return courseRepository.findAll();
+        Span span = tracer.spanBuilder("getCourses").startSpan();
+        try{
+            return courseRepository.findAll();
+        }finally {
+            span.end();
+        }
     }
 
     @RequestMapping("/{id}")
